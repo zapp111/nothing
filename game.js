@@ -115,8 +115,12 @@
   let collected = {modak:0, flower:0, durva:0, golden:0, total:0};
   let totalStats = {score:0, golden:0, offerings:0, bestCombo:0, perfectStages:0, stagesCleared:0};
   let spawnTimer = 0, difficultyTimer = 0, invulnerableTimer = 0, shakeTimer = 0;
-  let bestScore = parseInt(localStorage.getItem("mushak_best")||"0",10);
-  let isMuted = localStorage.getItem("mushak_muted")==="true";
+  let bestScore = 0;
+  let isMuted = false;
+  try {
+    bestScore = parseInt(localStorage.getItem("mushak_best")||"0",10);
+    isMuted = localStorage.getItem("mushak_muted")==="true";
+  } catch(e){ console.warn("localStorage blocked", e); bestScore=0; isMuted=false; }
   let mushak = {x:DESIGN_W/2, y:DESIGN_H-140, w:78, h:78, speed:680, targetX:DESIGN_W/2, vx:0};
   let collectibles=[], obstacles=[], particles=[], floatTexts=[];
   let roadOffset=0, decorOffset=0;
@@ -219,7 +223,7 @@
   }
   function toggleMute() {
     isMuted=!isMuted;
-    localStorage.setItem("mushak_muted", String(isMuted));
+    try { localStorage.setItem("mushak_muted", String(isMuted)); } catch(e){}
     updateMuteUI();
     if(isMuted) stopBackgroundMusic(); else if(gameState==="PLAYING") startBackgroundMusic();
   }
@@ -314,11 +318,15 @@
 
   // Game logic
   function resetStage(){
-    const stage=getStage(); stageTimeLeft=stage.duration; gameSpeed=stage.baseSpeed; distanceTraveled=0; spawnTimer=0; difficultyTimer=0;
+    const stage=getStage(); stageTimeLeft=stage.duration; gameSpeed=stage.baseSpeed; distanceTraveled=0; spawnTimer=-0.5; difficultyTimer=0;
     collectibles=[]; obstacles=[]; particles=[]; floatTexts=[];
     collected={modak:0, flower:0, durva:0, golden:0, total:0};
     mushak.x=DESIGN_W/2 - mushak.w/2; mushak.targetX=mushak.x;
     blessingMeter=0; blessingReady=false; blessingActive=false; blessingTimer=0; invulnerableTimer=0; combo=0;
+    // Force immediate spawns for mobile - ensure something appears
+    for(let i=0;i<3;i++){
+      setTimeout(()=>{ if(gameState==="PLAYING") spawnCollectible(); }, i*200);
+    }
   }
   function resetGame(){
     currentStageIndex=0; score=0; lives=3; bestCombo=0;
@@ -353,7 +361,7 @@
       document.getElementById("resultStages").textContent=`3 / 3`;
       document.getElementById("resultSpeed").textContent=`+${timeBonus+perfectBonus+goldenBonus}`;
       document.getElementById("resultTotal").textContent=finalTotal;
-      if(finalTotal>bestScore){ bestScore=finalTotal; localStorage.setItem("mushak_best",String(bestScore)); ui.bestMenu.textContent=bestScore; }
+      if(finalTotal>bestScore){ bestScore=finalTotal; try{ localStorage.setItem("mushak_best",String(bestScore)); }catch(e){} ui.bestMenu.textContent=bestScore; }
       showScreen("results"); SFX.stageComplete();
     } else {
       gameState="GAME_OVER";
@@ -368,7 +376,7 @@
       document.getElementById("gameOverTitle").textContent=lives<=0?"💫 GAME OVER":"⏱️ TIME UP!";
       showScreen("gameOver"); SFX.gameOver();
     }
-    if(score>bestScore){ bestScore=score; localStorage.setItem("mushak_best",String(bestScore)); ui.bestMenu.textContent=bestScore; }
+    if(score>bestScore){ bestScore=score; try{ localStorage.setItem("mushak_best",String(bestScore)); }catch(e){} ui.bestMenu.textContent=bestScore; }
   }
   function handleCollect(item){
     const cfg=COLLECTIBLES_CFG[item.type]; const mult=getComboMultiplier(); const points=Math.floor(cfg.value*mult);
@@ -443,6 +451,12 @@
       spawnCollectible();
       if(progress>0.5 && Math.random()<0.5) spawnCollectible();
       if(progress>0.8 && Math.random()<0.4) spawnObstacle();
+    }
+    // Failsafe for mobile: if nothing on screen for 2s, force spawn
+    if(collectibles.length===0 && obstacles.length===0 && spawnTimer>1.5){
+      spawnCollectible();
+      if(Math.random()<0.5) spawnObstacle();
+      spawnTimer=0.5;
     }
     for(let i=collectibles.length-1;i>=0;i--){
       const c=collectibles[i]; c.y+=gameSpeed*dt; c.rotation+=c.rotSpeed*dt; c.bob+=dt*3;
@@ -672,7 +686,7 @@
     animationId=requestAnimationFrame(gameLoop);
   }
 
-  // Input
+  // Input - Enhanced for mobile
   window.addEventListener("keydown",(e)=>{
     keys[e.key]=true;
     if(e.code==="Space"){ e.preventDefault(); if(gameState==="PLAYING") activateBlessing(); }
@@ -681,22 +695,92 @@
   });
   window.addEventListener("keyup",(e)=>{ keys[e.key]=false; });
 
-  btn.left.addEventListener("touchstart",(e)=>{ e.preventDefault(); touchLeft=true; }); btn.left.addEventListener("touchend",(e)=>{ e.preventDefault(); touchLeft=false; });
-  btn.left.addEventListener("mousedown",()=>touchLeft=true); btn.left.addEventListener("mouseup",()=>touchLeft=false); btn.left.addEventListener("mouseleave",()=>touchLeft=false);
-  btn.right.addEventListener("touchstart",(e)=>{ e.preventDefault(); touchRight=true; }); btn.right.addEventListener("touchend",(e)=>{ e.preventDefault(); touchRight=false; });
-  btn.right.addEventListener("mousedown",()=>touchRight=true); btn.right.addEventListener("mouseup",()=>touchRight=false); btn.right.addEventListener("mouseleave",()=>touchRight=false);
-  btn.blessing.addEventListener("click",()=>{ if(gameState==="PLAYING") activateBlessing(); });
-  btn.blessing.addEventListener("touchstart",(e)=>{ e.preventDefault(); if(gameState==="PLAYING") activateBlessing(); });
+  // Mobile buttons - both touch and mouse
+  function bindMobileBtn(btnEl, onStart, onEnd){
+    if(!btnEl) return;
+    const start = (e)=>{ e.preventDefault(); onStart(); };
+    const end = (e)=>{ e.preventDefault(); onEnd(); };
+    btnEl.addEventListener("touchstart", start, {passive:false});
+    btnEl.addEventListener("touchend", end, {passive:false});
+    btnEl.addEventListener("touchcancel", end, {passive:false});
+    btnEl.addEventListener("mousedown", onStart);
+    btnEl.addEventListener("mouseup", onEnd);
+    btnEl.addEventListener("mouseleave", onEnd);
+  }
+  bindMobileBtn(btn.left, ()=>{ touchLeft=true; }, ()=>{ touchLeft=false; });
+  bindMobileBtn(btn.right, ()=>{ touchRight=true; }, ()=>{ touchRight=false; });
+  bindMobileBtn(btn.blessing, ()=>{ if(gameState==="PLAYING") activateBlessing(); }, ()=>{});
 
   function getCanvasPos(e){
-    const rect=canvas.getBoundingClientRect(); const clientX=e.touches?e.touches[0].clientX:e.clientX; const scaleX=DESIGN_W/rect.width; return (clientX-rect.left)*scaleX;
+    const rect=canvas.getBoundingClientRect();
+    let clientX, clientY;
+    if(e.touches && e.touches[0]){ clientX=e.touches[0].clientX; clientY=e.touches[0].clientY; }
+    else if(e.changedTouches && e.changedTouches[0]){ clientX=e.changedTouches[0].clientX; clientY=e.changedTouches[0].clientY; }
+    else { clientX=e.clientX; clientY=e.clientY; }
+    const scaleX = DESIGN_W / rect.width;
+    // const scaleY = DESIGN_H / rect.height; // not needed for X only
+    return {x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * (DESIGN_H / rect.height)};
   }
-  canvas.addEventListener("touchstart",(e)=>{ e.preventDefault(); isDragging=true; dragX=getCanvasPos(e); mushak.targetX=dragX-mushak.w/2; },{passive:false});
-  canvas.addEventListener("touchmove",(e)=>{ e.preventDefault(); if(isDragging){ dragX=getCanvasPos(e); mushak.targetX=dragX-mushak.w/2; } },{passive:false});
-  canvas.addEventListener("touchend",(e)=>{ e.preventDefault(); isDragging=false; });
-  canvas.addEventListener("mousedown",(e)=>{ isDragging=true; dragX=getCanvasPos(e); mushak.targetX=dragX-mushak.w/2; });
-  canvas.addEventListener("mousemove",(e)=>{ if(isDragging){ dragX=getCanvasPos(e); mushak.targetX=dragX-mushak.w/2; } });
+  // Pointer events for better mobile support
+  canvas.style.touchAction = "none";
+  canvas.addEventListener("pointerdown", (e)=>{
+    e.preventDefault();
+    isDragging=true;
+    const pos=getCanvasPos(e);
+    dragX=pos.x;
+    mushak.targetX=dragX - mushak.w/2;
+    try{ canvas.setPointerCapture(e.pointerId); }catch{}
+  });
+  canvas.addEventListener("pointermove", (e)=>{
+    if(!isDragging) return;
+    e.preventDefault();
+    const pos=getCanvasPos(e);
+    dragX=pos.x;
+    mushak.targetX=dragX - mushak.w/2;
+  });
+  canvas.addEventListener("pointerup", (e)=>{
+    e.preventDefault();
+    isDragging=false;
+    try{ canvas.releasePointerCapture(e.pointerId); }catch{}
+  });
+  canvas.addEventListener("pointercancel", (e)=>{
+    isDragging=false;
+  });
+  // Fallback touch events
+  canvas.addEventListener("touchstart",(e)=>{
+    e.preventDefault();
+    isDragging=true;
+    const pos=getCanvasPos(e);
+    dragX=pos.x;
+    mushak.targetX=dragX - mushak.w/2;
+  },{passive:false});
+  canvas.addEventListener("touchmove",(e)=>{
+    e.preventDefault();
+    if(isDragging){
+      const pos=getCanvasPos(e);
+      dragX=pos.x;
+      mushak.targetX=dragX - mushak.w/2;
+    }
+  },{passive:false});
+  canvas.addEventListener("touchend",(e)=>{
+    e.preventDefault();
+    isDragging=false;
+  },{passive:false});
+  canvas.addEventListener("mousedown",(e)=>{
+    isDragging=true;
+    const pos=getCanvasPos(e);
+    dragX=pos.x;
+    mushak.targetX=dragX - mushak.w/2;
+  });
+  canvas.addEventListener("mousemove",(e)=>{
+    if(isDragging){
+      const pos=getCanvasPos(e);
+      dragX=pos.x;
+      mushak.targetX=dragX - mushak.w/2;
+    }
+  });
   window.addEventListener("mouseup",()=>isDragging=false);
+  window.addEventListener("touchend",()=>{ isDragging=false; touchLeft=false; touchRight=false; });
 
   // Buttons
   btn.play.addEventListener("click",()=>{ getAudio(); startGame(); });
