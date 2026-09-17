@@ -31,7 +31,10 @@
     {count:6, mult:3, text:"COMBO x3!!"},
     {count:10, mult:4, text:"COMBO x4!!! 🔥"},
     {count:15, mult:5, text:"COMBO x5!!!!! 🌟"},
-    {count:22, mult:6, text:"GODLIKE x6!!!! 🌟🌟"}
+    {count:22, mult:6, text:"GODLIKE x6!!!! 🌟🌟"},
+    {count:30, mult:7, text:"LEGENDARY x7!!!!! 💫"},
+    {count:40, mult:8, text:"MYTHIC x8!!!!!! 🌈"},
+    {count:55, mult:10, text:"FESTIVAL GOD x10!!!!!!! 🎉"}
   ];
 
   // DOM
@@ -234,12 +237,21 @@
   function getComboMultiplier(){
     let mult=1;
     for(let i=COMBO_THRESHOLDS.length-1;i>=0;i--) if(combo>=COMBO_THRESHOLDS[i].count){ mult=COMBO_THRESHOLDS[i].mult; break; }
+    // Infinite scaling after max threshold: every 15 combo adds +1 mult
+    const maxThresh = COMBO_THRESHOLDS[COMBO_THRESHOLDS.length-1];
+    if(combo > maxThresh.count){
+      const extra = Math.floor((combo - maxThresh.count) / 12);
+      mult = maxThresh.mult + extra;
+    }
     if(blessingActive) mult=Math.max(mult*1.5, mult+1);
-    return mult;
+    return Math.floor(mult);
   }
   function getComboText(){
     for(let i=COMBO_THRESHOLDS.length-1;i>=0;i--) if(combo>=COMBO_THRESHOLDS[i].count) return COMBO_THRESHOLDS[i].text;
-    return combo>1?`COMBO x${getComboMultiplier()}`:"";
+    if(combo > COMBO_THRESHOLDS[COMBO_THRESHOLDS.length-1].count){
+      return `FESTIVAL GOD x${getComboMultiplier()}!!!!!!! 🎉🐭`;
+    }
+    return combo>1?`COMBO x${getComboMultiplier()} (${combo})`:"";
   }
   const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
   const rand=(min,max)=>Math.random()*(max-min)+min;
@@ -356,7 +368,7 @@
     if(item.type==="golden") SFX.golden(); else SFX.collect();
     if(combo>=3){
       const text=getComboText(); ui.comboPopup.textContent=text; ui.comboPopup.classList.add("show"); setTimeout(()=>ui.comboPopup.classList.remove("show"),900);
-      if([3,6,10,15,22].includes(combo)) SFX.combo(getComboMultiplier());
+      if(COMBO_THRESHOLDS.some(t=>t.count===combo)) SFX.combo(getComboMultiplier());
     }
     updateUI();
   }
