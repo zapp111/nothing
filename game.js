@@ -5,14 +5,14 @@
 
 (() => {
   const DESIGN_W = 1600, DESIGN_H = 900;
-  // Responsive road margins - wider road on phone so it doesn't look thin
+  // Responsive road margins - MUCH wider road on phone so it doesn't look thin
   function getRoadMargin(){
     if(typeof window!=="undefined"){
-      if(window.innerWidth < 380) return 70;
-      if(window.innerWidth < 600) return 90;
-      if(window.innerWidth < 900) return 140;
+      if(window.innerWidth < 380) return 35;  // 95% road width on very small
+      if(window.innerWidth < 600) return 50;  // 93% on phone
+      if(window.innerWidth < 900) return 90;  // 88% on tablet
     }
-    return 280;
+    return 280; // 65% on desktop (original)
   }
   let ROAD_MARGIN = getRoadMargin();
   let ROAD_LEFT = ROAD_MARGIN, ROAD_RIGHT = DESIGN_W - ROAD_MARGIN;
