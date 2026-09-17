@@ -214,8 +214,21 @@
 
   // Helpers
   function showScreen(name){
+    // Screens that should keep game visible behind them
+    const keepGameBehind = ["pause","stageComplete","gameOver","results"];
+    const isOverlay = keepGameBehind.includes(name);
+
     Object.values(screens).forEach(s=>s&&s.classList.remove("active"));
     if(screens[name]) screens[name].classList.add("active");
+    // Keep game canvas visible under overlays
+    if(isOverlay && screens.game){
+      screens.game.classList.add("active");
+    }
+    // Ensure game UI still draws behind modals
+    if(isOverlay){
+      // Re-trigger a draw to show background
+      if(gameState!=="PLAYING") draw();
+    }
   }
   function getStage(){ return STAGES[currentStageIndex]; }
   function getComboMultiplier(){
@@ -624,8 +637,13 @@
   function gameLoop(time){
     const dt=Math.min((time-lastTime)/1000,0.033); lastTime=time;
     if(gameState==="PLAYING") update(dt);
+    else if(gameState==="MENU" || gameState==="LOADING"){
+      // Animate background even in menu
+      roadOffset+=1.2; decorOffset+=0.6;
+    }
     draw();
-    if(gameState==="PLAYING" || gameState==="MENU" || gameState==="LOADING") animationId=requestAnimationFrame(gameLoop);
+    // Always keep loop alive for smooth UI, except when explicitly in overlay we still draw static background
+    animationId=requestAnimationFrame(gameLoop);
   }
 
   // Input
