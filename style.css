@@ -203,12 +203,9 @@ body{
 
 
 
-/* MOBILE FIX: Big playing screen, no stretch, no thin */
 
 
-
-
-/* TABLET - works at 601px */
+/* TABLET - 601px to 900px - WORKS */
 @media (max-width:900px){
   .game-wrapper{width:100vw; height:100vh; height:100dvh; border-radius:0; aspect-ratio:auto; flex-direction:column;}
   #gameScreen{flex-direction:column; flex:1; min-height:0; width:100%; height:100%;}
@@ -217,8 +214,8 @@ body{
     background:#0d0618; max-height:none; aspect-ratio:auto;
   }
   #gameCanvas{
-    width:100% !important; height:auto !important; max-width:100% !important; max-height:78vh !important;
-    aspect-ratio:16/9; object-fit:contain !important; display:block; margin:0 auto;
+    width:100% !important; height:auto !important; max-width:100vw !important; max-height:70vh !important;
+    aspect-ratio:16/9 !important; object-fit:contain !important; display:block; margin:0 auto;
   }
   .mobile-controls{display:flex; position:relative; order:3; background:linear-gradient(0deg, rgba(0,0,0,0.85), rgba(13,6,24,0.9)); border-top:1px solid rgba(255,189,89,0.2);}
   #gameUI{position:relative; order:1; background:rgba(13,6,24,0.92); padding:0.35rem;}
@@ -226,11 +223,10 @@ body{
   .blessing-container{width:150px;}
 }
 
-/* PHONE PORTRAIT - BIG, not thin, not stretched - uses 900x1400 design */
+/* PHONE - 600px and below - SAME as tablet, just more compact, so it works */
 @media (max-width:600px){
-  body{align-items:stretch; justify-content:stretch; overflow:hidden;}
-  .game-wrapper{width:100vw; height:100vh; height:100dvh; min-height:100vh; min-height:100dvh; border-radius:0; aspect-ratio:auto; flex-direction:column; box-shadow:none;}
-  #startScreen{padding:0.5rem; overflow:auto; align-items:center;}
+  .game-wrapper{width:100vw; height:100vh; height:100dvh; border-radius:0; aspect-ratio:auto; flex-direction:column;}
+  #startScreen{padding:0.5rem; overflow:auto;}
   .start-content{width:100%; max-width:100%; gap:0.5rem;}
   .start-card{width:96vw; max-width:96vw; padding:0.7rem; margin:0 auto;}
   .game-title{font-size:clamp(1.6rem, 8vw, 2.2rem);}
@@ -246,12 +242,11 @@ body{
   .canvas-container{
     order:2; width:100vw; flex:1 1 auto; min-height:0; height:auto; max-height:none;
     aspect-ratio:auto; display:flex; align-items:center; justify-content:center;
-    background:radial-gradient(800px 600px at 50% 0%, rgba(255,140,66,0.12), transparent), #0d0618;
+    background:#0d0618;
   }
   #gameCanvas{
-    width:100% !important; height:auto !important; max-width:100vw !important; max-height:78vh !important;
-    min-height:0 !important; aspect-ratio:900/1400 !important; /* tall portrait */
-    object-fit:contain !important; display:block; margin:0 auto;
+    width:100% !important; height:auto !important; max-width:100vw !important; max-height:68vh !important;
+    aspect-ratio:16/9 !important; object-fit:contain !important; display:block; margin:0 auto;
   }
   
   .mobile-controls{
@@ -263,21 +258,4 @@ body{
   .m-btn{width:50px;height:50px; font-size:1rem;}
   .blessing-m-btn{width:56px;height:56px; font-size:1.15rem;}
   .modal-card{width:96vw; max-width:96vw; padding:0.8rem; max-height:90vh;}
-}
-
-/* Very small phones */
-@media (max-width:380px){
-  #gameCanvas{max-height:75vh !important;}
-  .ui-pill{font-size:0.55rem; padding:0.12rem 0.28rem;}
-  .m-btn{width:46px;height:46px;}
-}
-
-/* Landscape phone - best experience */
-@media (max-height:500px) and (orientation:landscape){
-  .game-wrapper{height:100vh; width:100vw;}
-  #gameScreen{flex-direction:row; flex-wrap:wrap;}
-  #gameUI{width:100%; order:1;}
-  .canvas-container{order:2; flex:1; max-height:100%; aspect-ratio:16/9 !important;}
-  #gameCanvas{max-height:85vh !important; aspect-ratio:16/9 !important;}
-  .mobile-controls{order:3; width:100%; padding:0.2rem 0.5rem;}
 }
