@@ -5,8 +5,22 @@
 
 (() => {
   const DESIGN_W = 1600, DESIGN_H = 900;
-  const ROAD_MARGIN = 280;
-  const ROAD_LEFT = ROAD_MARGIN, ROAD_RIGHT = DESIGN_W - ROAD_MARGIN;
+  // Responsive road margins - wider road on phone so it doesn't look thin
+  function getRoadMargin(){
+    if(typeof window!=="undefined"){
+      if(window.innerWidth < 380) return 70;
+      if(window.innerWidth < 600) return 90;
+      if(window.innerWidth < 900) return 140;
+    }
+    return 280;
+  }
+  let ROAD_MARGIN = getRoadMargin();
+  let ROAD_LEFT = ROAD_MARGIN, ROAD_RIGHT = DESIGN_W - ROAD_MARGIN;
+  function updateRoadMargins(){
+    ROAD_MARGIN = getRoadMargin();
+    ROAD_LEFT = ROAD_MARGIN;
+    ROAD_RIGHT = DESIGN_W - ROAD_MARGIN;
+  }
 
   const STAGES = [
     { id:1, name:"🛕 Stage 1 — The Pandal", subtitle:"The Pandal", duration:45, baseSpeed:320, maxSpeed:480, spawnInterval:0.85, obstacleChance:0.28, goldenChance:0.06, objective:{modak:4, flower:3, durva:2, total:12}, bg:{skyTop:"#1a0b2e", skyMid:"#2d1b4e", road:"#3a2a1a", roadLine:"#ffbd59"}, decor:"pandal" },
@@ -711,6 +725,13 @@
   async function init(){
     updateMuteUI();
     ui.bestMenu.textContent=bestScore;
+    updateRoadMargins();
+    window.addEventListener("resize", ()=>{
+      updateRoadMargins();
+      // Keep mushak inside new road
+      mushak.x = clamp(mushak.x, ROAD_LEFT+8, ROAD_RIGHT-mushak.w-8);
+      mushak.targetX = clamp(mushak.targetX, ROAD_LEFT+8, ROAD_RIGHT-mushak.w-8);
+    });
     showScreen("loading");
     lastTime=performance.now();
     animationId=requestAnimationFrame(gameLoop);
@@ -719,7 +740,7 @@
     setTimeout(()=>{
       gameState="MENU";
       showScreen("start");
-      console.log("🐭 Mushak v1.0 ready — images loaded:", Object.keys(images).length);
+      console.log("🐭 Mushak v1.0 ready — images loaded:", Object.keys(images).length, "roadMargin:", ROAD_MARGIN);
     }, 600);
   }
   if(!CanvasRenderingContext2D.prototype.roundRect){
