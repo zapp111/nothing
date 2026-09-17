@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🐭 Mushak: The Festive Quest</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Baloo+2:wght@600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Festival background glow -->
+    <div class="bg-ambient">
+        <div class="bg-orb orb-1"></div>
+        <div class="bg-orb orb-2"></div>
+        <div class="bg-orb orb-3"></div>
+    </div>
+
+    <div class="game-wrapper">
+        <!-- START SCREEN -->
+        <div id="startScreen" class="screen active">
+            <div class="start-content">
+                <div class="logo-area">
+                    <div class="mushak-hero">🐭</div>
+                    <div class="diyas">🪔 ✨ 🪔</div>
+                    <h1 class="game-title">MUSHAK:<br><span>THE FESTIVE QUEST</span></h1>
+                    <p class="subtitle">Ganesh Chaturthi Arcade Adventure</p>
+                </div>
+                
+                <div class="start-card">
+                    <p class="story">Help Mushak collect Modaks, Flowers & Durva for the celebration. Avoid obstacles, build combos, and invoke Ganesha's Blessing!</p>
+                    
+                    <div class="menu-buttons">
+                        <button id="playBtn" class="btn btn-primary">▶ PLAY</button>
+                        <button id="howToPlayBtn" class="btn btn-secondary">📖 HOW TO PLAY</button>
+                    </div>
+
+                    <div class="stage-preview">
+                        <div class="stage-dot active">🛕 Pandal</div>
+                        <div class="stage-line"></div>
+                        <div class="stage-dot">🥁 Procession</div>
+                        <div class="stage-line"></div>
+                        <div class="stage-dot">🌊 Final Journey</div>
+                    </div>
+
+                    <p class="best-score-display">Best Score: <span id="bestScoreMenu">0</span></p>
+                </div>
+
+                <div class="footer-note">Respectfully themed • No disrespectful depiction • Solo Project</div>
+            </div>
+        </div>
+
+        <!-- HOW TO PLAY -->
+        <div id="howToPlayScreen" class="screen modal-screen">
+            <div class="modal-card">
+                <h2>📖 HOW TO PLAY</h2>
+                <div class="htp-grid">
+                    <div class="htp-item">
+                        <span class="htp-icon">🎮</span>
+                        <div><b>Move Mushak</b><br>A / D or ← / → <br><small>Mobile: Drag or use ◀ ▶</small></div>
+                    </div>
+                    <div class="htp-item">
+                        <span class="htp-icon">🍬</span>
+                        <div><b>Collect Offerings</b><br>Modak +10, Flower +15, Durva +20, Golden +100</div>
+                    </div>
+                    <div class="htp-item">
+                        <span class="htp-icon">🚧</span>
+                        <div><b>Avoid Obstacles</b><br>Stones, boxes, barriers. Hit = lose life + combo reset</div>
+                    </div>
+                    <div class="htp-item">
+                        <span class="htp-icon">🔥</span>
+                        <div><b>Build Combo</b><br>3→×2, 6→×3, 10→×4, 15→×5. Keep collecting without hitting!</div>
+                    </div>
+                    <div class="htp-item">
+                        <span class="htp-icon">🙏</span>
+                        <div><b>Ganesha's Blessing</b><br>Fill meter by collecting. Press SPACE when ready. Slows time, boosts score!</div>
+                    </div>
+                    <div class="htp-item">
+                        <span class="htp-icon">🎯</span>
+                        <div><b>Objective</b><br>Collect required offerings & reach the Pandal before time runs out!</div>
+                    </div>
+                </div>
+                <button id="htpBackBtn" class="btn btn-primary">GOT IT — LET'S GO!</button>
+            </div>
+        </div>
+
+        <!-- GAME SCREEN -->
+        <div id="gameScreen" class="screen">
+            <div id="gameUI">
+                <div class="ui-top">
+                    <div class="ui-left">
+                        <div class="ui-pill score-pill">⭐ <span id="scoreDisplay">0</span> <small id="comboDisplay"></small></div>
+                        <div class="ui-pill objective-pill">🎯 <span id="objectiveDisplay">0 / 10</span></div>
+                    </div>
+                    <div class="ui-center">
+                        <div class="stage-indicator"><span id="stageName">🛕 Stage 1 — The Pandal</span></div>
+                        <div class="blessing-container">
+                            <div class="blessing-label">GANESHA'S BLESSING <span id="blessingStatus"></span></div>
+                            <div class="blessing-bar"><div id="blessingFill" class="blessing-fill"></div></div>
+                        </div>
+                    </div>
+                    <div class="ui-right">
+                        <div class="ui-pill time-pill">⏱️ <span id="timerDisplay">60</span>s</div>
+                        <div class="ui-pill lives-pill">❤️ <span id="livesDisplay">❤️❤️❤️</span></div>
+                        <button id="pauseBtn" class="btn-icon">⏸️</button>
+                    </div>
+                </div>
+
+                <div id="comboPopup" class="combo-popup"></div>
+                <div id="blessingPopup" class="blessing-popup">✨ GANESHA'S BLESSING ✨</div>
+            </div>
+
+            <div class="canvas-container">
+                <canvas id="gameCanvas" width="1600" height="900"></canvas>
+            </div>
+
+            <div id="mobileControls" class="mobile-controls">
+                <button id="leftBtn" class="m-btn">◀</button>
+                <div class="m-center">
+                    <button id="blessingBtn" class="m-btn blessing-m-btn">🙏</button>
+                    <div class="m-hint">DRAG TO MOVE</div>
+                </div>
+                <button id="rightBtn" class="m-btn">▶</button>
+            </div>
+        </div>
+
+        <!-- PAUSE SCREEN -->
+        <div id="pauseScreen" class="screen modal-screen">
+            <div class="modal-card small">
+                <h2>⏸️ PAUSED</h2>
+                <div class="menu-buttons">
+                    <button id="resumeBtn" class="btn btn-primary">▶ RESUME</button>
+                    <button id="restartBtnPause" class="btn btn-secondary">🔄 RESTART</button>
+                    <button id="mainMenuBtnPause" class="btn btn-secondary">🏠 MAIN MENU</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STAGE COMPLETE -->
+        <div id="stageCompleteScreen" class="screen modal-screen">
+            <div class="modal-card">
+                <h2 id="stageCompleteTitle">🛕 STAGE COMPLETE!</h2>
+                <div class="results-grid">
+                    <div class="result-item"><span>Score</span><b id="stageScore">0</b></div>
+                    <div class="result-item"><span>Best Combo</span><b id="stageCombo">x0</b></div>
+                    <div class="result-item"><span>Golden Modaks</span><b id="stageGolden">0</b></div>
+                    <div class="result-item"><span>Time Bonus</span><b id="stageTimeBonus">+0</b></div>
+                </div>
+                <div class="menu-buttons">
+                    <button id="nextStageBtn" class="btn btn-primary">➡️ NEXT STAGE</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- GAME OVER -->
+        <div id="gameOverScreen" class="screen modal-screen">
+            <div class="modal-card">
+                <h2 id="gameOverTitle">GAME OVER</h2>
+                <p id="gameOverReason">You ran out of lives!</p>
+                <div class="results-grid">
+                    <div class="result-item"><span>Final Score</span><b id="finalScore">0</b></div>
+                    <div class="result-item"><span>Best Combo</span><b id="finalCombo">x0</b></div>
+                    <div class="result-item"><span>Golden Modaks</span><b id="finalGolden">0</b></div>
+                    <div class="result-item"><span>Stages Cleared</span><b id="finalStages">0 / 3</b></div>
+                    <div class="result-item highlight"><span>Best Score</span><b id="bestScoreDisplay">0</b></div>
+                </div>
+                <div class="menu-buttons">
+                    <button id="playAgainBtn" class="btn btn-primary">🔄 PLAY AGAIN</button>
+                    <button id="mainMenuBtnGameOver" class="btn btn-secondary">🏠 MAIN MENU</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- FINAL RESULTS -->
+        <div id="resultsScreen" class="screen modal-screen">
+            <div class="modal-card celebration">
+                <div class="celebration-emoji">🎉 🐭 ✨</div>
+                <h2>🏆 FESTIVAL COMPLETE!</h2>
+                <p>You helped prepare the grand Ganesh Chaturthi celebration!</p>
+                <div class="results-grid">
+                    <div class="result-item"><span>Final Score</span><b id="resultFinalScore">0</b></div>
+                    <div class="result-item"><span>Best Combo</span><b id="resultBestCombo">x0</b></div>
+                    <div class="result-item"><span>Golden Modaks</span><b id="resultGolden">0</b></div>
+                    <div class="result-item"><span>Total Offerings</span><b id="resultOfferings">0</b></div>
+                    <div class="result-item"><span>Perfect Stages</span><b id="resultPerfect">0</b></div>
+                    <div class="result-item highlight"><span>Speed Bonus</span><b id="resultSpeed">+0</b></div>
+                    <div class="result-item highlight total"><span>TOTAL SCORE</span><b id="resultTotal">0</b></div>
+                </div>
+                <div class="menu-buttons">
+                    <button id="playAgainFinalBtn" class="btn btn-primary">🔄 PLAY AGAIN</button>
+                    <button id="mainMenuBtnFinal" class="btn btn-secondary">🏠 MAIN MENU</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
