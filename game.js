@@ -4,22 +4,51 @@
 */
 
 (() => {
-  const DESIGN_W = 1600, DESIGN_H = 900;
+  let DESIGN_W = 1600, DESIGN_H = 900;
+  // Responsive canvas size - taller on phone portrait so not small/thin
+  function getDesignSize(){
+    if(typeof window!=="undefined"){
+      const isPortrait = window.innerHeight > window.innerWidth;
+      if(window.innerWidth < 600 && isPortrait){
+        // Portrait phone: taller canvas, 9:14 aspect (~0.64) - more vertical space for runner
+        return {w: 900, h: 1400};
+      }
+      if(window.innerWidth < 900){
+        // Tablet portrait: 3:4
+        return {w: 1200, h: 900};
+      }
+    }
+    return {w: 1600, h: 900};
+  }
   // Responsive road margins - MUCH wider road on phone so it doesn't look thin
   function getRoadMargin(){
-    if(typeof window!=="undefined"){
-      if(window.innerWidth < 380) return 35;  // 95% road width on very small
-      if(window.innerWidth < 600) return 50;  // 93% on phone
-      if(window.innerWidth < 900) return 90;  // 88% on tablet
-    }
-    return 280; // 65% on desktop (original)
+    const size = getDesignSize();
+    if(size.w <= 900) return 35; // 92% road on portrait phone
+    if(size.w <= 1200) return 80;
+    if(typeof window!=="undefined" && window.innerWidth < 600) return 50;
+    if(typeof window!=="undefined" && window.innerWidth < 900) return 90;
+    return 280;
   }
   let ROAD_MARGIN = getRoadMargin();
   let ROAD_LEFT = ROAD_MARGIN, ROAD_RIGHT = DESIGN_W - ROAD_MARGIN;
   function updateRoadMargins(){
+    const size = getDesignSize();
+    DESIGN_W = size.w;
+    DESIGN_H = size.h;
     ROAD_MARGIN = getRoadMargin();
     ROAD_LEFT = ROAD_MARGIN;
     ROAD_RIGHT = DESIGN_W - ROAD_MARGIN;
+    // Update canvas internal size
+    if(canvas){
+      canvas.width = DESIGN_W;
+      canvas.height = DESIGN_H;
+    }
+    // Keep mushak inside
+    if(mushak){
+      mushak.y = DESIGN_H - 140;
+      mushak.x = clamp(mushak.x, ROAD_LEFT+8, ROAD_RIGHT-mushak.w-8);
+      mushak.targetX = clamp(mushak.targetX, ROAD_LEFT+8, ROAD_RIGHT-mushak.w-8);
+    }
   }
 
   const STAGES = [
