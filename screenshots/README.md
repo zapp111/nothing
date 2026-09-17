@@ -1,0 +1,1 @@
+# Screenshots\n\nAdd gameplay screenshots here for README and submission.\n\n- Start screen\n- Gameplay Stage 1\n- Combo x4\n- Blessing activation\n- Stage Complete\n- Final Results\n- Mobile view\n\nUse Chrome DevTools screenshot or OBS.

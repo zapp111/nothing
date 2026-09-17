@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Mushak: The Festive Quest — Help Mushak collect offerings for Ganesh Chaturthi. A respectful 2D arcade adventure.">
+    <meta name="theme-color" content="#1a0b2e">
     <title>🐭 Mushak: The Festive Quest</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Baloo+2:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐭</text></svg>">
 </head>
 <body>
-    <!-- Festival background glow -->
     <div class="bg-ambient">
         <div class="bg-orb orb-1"></div>
         <div class="bg-orb orb-2"></div>
@@ -18,36 +20,66 @@
     </div>
 
     <div class="game-wrapper">
+        <!-- LOADING SCREEN -->
+        <div id="loadingScreen" class="screen active">
+            <div class="loading-content">
+                <div class="mushak-hero loading-hero">🐭</div>
+                <h2>Loading Festival...</h2>
+                <div class="loading-bar"><div id="loadingFill" class="loading-fill"></div></div>
+                <p id="loadingText" class="loading-text">Preparing offerings...</p>
+                <div class="loading-tips">🪔 Tip: Golden Modaks hide in risky places — worth the danger!</div>
+            </div>
+        </div>
+
         <!-- START SCREEN -->
-        <div id="startScreen" class="screen active">
+        <div id="startScreen" class="screen">
             <div class="start-content">
                 <div class="logo-area">
-                    <div class="mushak-hero">🐭</div>
+                    <div class="mushak-hero" id="heroImageContainer">
+                        <img id="heroMushakImg" src="assets/images/mushak.png" alt="Mushak" class="hero-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+                        <span style="display:none">🐭</span>
+                    </div>
                     <div class="diyas">🪔 ✨ 🪔</div>
                     <h1 class="game-title">MUSHAK:<br><span>THE FESTIVE QUEST</span></h1>
-                    <p class="subtitle">Ganesh Chaturthi Arcade Adventure</p>
+                    <p class="subtitle">Ganesh Chaturthi Arcade Adventure • 2026 Contest</p>
                 </div>
                 
                 <div class="start-card">
-                    <p class="story">Help Mushak collect Modaks, Flowers & Durva for the celebration. Avoid obstacles, build combos, and invoke Ganesha's Blessing!</p>
+                    <p class="story">Help Mushak collect Modaks, Flowers & Durva for the grand celebration. Avoid obstacles, build combos, and invoke <b>Ganesha's Blessing</b>!</p>
                     
                     <div class="menu-buttons">
-                        <button id="playBtn" class="btn btn-primary">▶ PLAY</button>
-                        <button id="howToPlayBtn" class="btn btn-secondary">📖 HOW TO PLAY</button>
+                        <button id="playBtn" class="btn btn-primary">▶ PLAY FESTIVAL</button>
+                        <div class="btn-row">
+                            <button id="howToPlayBtn" class="btn btn-secondary small">📖 HOW TO PLAY</button>
+                            <button id="creditsBtn" class="btn btn-secondary small">🏆 CREDITS</button>
+                        </div>
                     </div>
 
                     <div class="stage-preview">
-                        <div class="stage-dot active">🛕 Pandal</div>
+                        <div class="stage-dot active"><span>🛕</span> Pandal</div>
                         <div class="stage-line"></div>
-                        <div class="stage-dot">🥁 Procession</div>
+                        <div class="stage-dot"><span>🥁</span> Procession</div>
                         <div class="stage-line"></div>
-                        <div class="stage-dot">🌊 Final Journey</div>
+                        <div class="stage-dot"><span>🌊</span> Final</div>
                     </div>
 
-                    <p class="best-score-display">Best Score: <span id="bestScoreMenu">0</span></p>
+                    <div class="stats-row">
+                        <div class="best-score-display">Best: <span id="bestScoreMenu">0</span></div>
+                        <div class="audio-toggle">
+                            <button id="audioToggle" class="btn-icon small">🔊</button>
+                            <span class="audio-label">Audio</span>
+                        </div>
+                    </div>
+
+                    <div class="collectibles-preview">
+                        <div class="cp-item"><img src="assets/images/modak.png" onerror="this.style.display='none'">🍬 +10</div>
+                        <div class="cp-item"><img src="assets/images/flower.png" onerror="this.style.display='none'">🌸 +15</div>
+                        <div class="cp-item"><img src="assets/images/durva.png" onerror="this.style.display='none'">🌿 +20</div>
+                        <div class="cp-item golden"><img src="assets/images/golden-modak.png" onerror="this.style.display='none'">✨ +100</div>
+                    </div>
                 </div>
 
-                <div class="footer-note">Respectfully themed • No disrespectful depiction • Solo Project</div>
+                <div class="footer-note">Respectfully themed • No disrespectful depiction • Solo Project • v1.0</div>
             </div>
         </div>
 
@@ -56,32 +88,35 @@
             <div class="modal-card">
                 <h2>📖 HOW TO PLAY</h2>
                 <div class="htp-grid">
-                    <div class="htp-item">
-                        <span class="htp-icon">🎮</span>
-                        <div><b>Move Mushak</b><br>A / D or ← / → <br><small>Mobile: Drag or use ◀ ▶</small></div>
-                    </div>
-                    <div class="htp-item">
-                        <span class="htp-icon">🍬</span>
-                        <div><b>Collect Offerings</b><br>Modak +10, Flower +15, Durva +20, Golden +100</div>
-                    </div>
-                    <div class="htp-item">
-                        <span class="htp-icon">🚧</span>
-                        <div><b>Avoid Obstacles</b><br>Stones, boxes, barriers. Hit = lose life + combo reset</div>
-                    </div>
-                    <div class="htp-item">
-                        <span class="htp-icon">🔥</span>
-                        <div><b>Build Combo</b><br>3→×2, 6→×3, 10→×4, 15→×5. Keep collecting without hitting!</div>
-                    </div>
-                    <div class="htp-item">
-                        <span class="htp-icon">🙏</span>
-                        <div><b>Ganesha's Blessing</b><br>Fill meter by collecting. Press SPACE when ready. Slows time, boosts score!</div>
-                    </div>
-                    <div class="htp-item">
-                        <span class="htp-icon">🎯</span>
-                        <div><b>Objective</b><br>Collect required offerings & reach the Pandal before time runs out!</div>
-                    </div>
+                    <div class="htp-item"><span class="htp-icon">🎮</span><div><b>Move Mushak</b><br>A / D or ← / → <br><small>Mobile: Drag finger or ◀ ▶</small></div></div>
+                    <div class="htp-item"><span class="htp-icon">🍬</span><div><b>Collect Offerings</b><br>Modak +10, Flower +15, Durva +20, Golden +100 — Golden in risky spots!</div></div>
+                    <div class="htp-item"><span class="htp-icon">🚧</span><div><b>Avoid Obstacles</b><br>Stones, boxes, barriers. Hit = -1 life + combo reset + 1.6s invulnerability</div></div>
+                    <div class="htp-item"><span class="htp-icon">🔥</span><div><b>Build Combo</b><br>3→×2, 6→×3, 10→×4, 15→×5, 22→×6. Multiplier boosts all points!</div></div>
+                    <div class="htp-item"><span class="htp-icon">🙏</span><div><b>Ganesha's Blessing</b><br>Fill meter (gold bar). When READY press SPACE / 🙏 button. Slows time 58%, +1.5× multiplier, invincible 6.5s!</div></div>
+                    <div class="htp-item"><span class="htp-icon">🎯</span><div><b>Objective</b><br>Each stage needs specific offerings. Collect them & survive till timer ends. Time <3s shows Pandal finish line!</div></div>
+                    <div class="htp-item"><span class="htp-icon">⭐</span><div><b>Scoring</b><br>Base + Combo + Time Bonus + Perfect Stage (+500) + Golden Bonus (+50 each). Save best score locally!</div></div>
+                    <div class="htp-item"><span class="htp-icon">📱</span><div><b>Mobile</b><br>Touch & drag Mushak directly, or use ◀ ▶. Blessing button glows when ready. Works in portrait & landscape!</div></div>
                 </div>
                 <button id="htpBackBtn" class="btn btn-primary">GOT IT — LET'S GO!</button>
+            </div>
+        </div>
+
+        <!-- CREDITS -->
+        <div id="creditsScreen" class="screen modal-screen">
+            <div class="modal-card">
+                <h2>🏆 CREDITS</h2>
+                <div class="credits-content">
+                    <div class="credit-section"><h3>🐭 Game</h3><p><b>Mushak: The Festive Quest</b><br>Ganesh Chaturthi Game Design Contest 2026<br>Solo Project</p></div>
+                    <div class="credit-section"><h3>🎨 Art</h3><p>AI Generated (Arena) + Canvas Procedural<br>Mushak, Modaks, Flowers, Durva, Diya, Pandal, Rangoli, Blessing<br>Style: Cute 2D festival-inspired, respectful</p></div>
+                    <div class="credit-section"><h3>🎵 Audio</h3><p>Web Audio API — Procedural SFX<br>Collect, Golden, Hit, Combo, Blessing Ready/Activate, Stage Complete<br>Background ambient via oscillators (no copyrighted music)</p></div>
+                    <div class="credit-section"><h3>💻 Tech</h3><p>HTML5, CSS3, JavaScript (Vanilla), Canvas 2D<br>No frameworks, lightweight, 60fps target<br>Mobile + Desktop, touch + keyboard</p></div>
+                    <div class="credit-section"><h3>🙏 Respect</h3><p>Lord Ganesha represented respectfully.<br>No harm, mockery, or disrespectful situations.<br>Blessing is visual aura, not power-up attack.</p></div>
+                    <div class="credit-section"><h3>📜 Tools</h3><p>VS Code, Chrome DevTools, GitHub Pages<br>Fonts: Fredoka, Baloo 2 (Google Fonts)<br>Emojis: System</p></div>
+                </div>
+                <div class="menu-buttons">
+                    <button id="creditsBackBtn" class="btn btn-primary">BACK TO MENU</button>
+                    <a href="https://github.com/zapp111/nothing" target="_blank" class="btn btn-secondary">📂 SOURCE CODE</a>
+                </div>
             </div>
         </div>
 
@@ -103,18 +138,19 @@
                     <div class="ui-right">
                         <div class="ui-pill time-pill">⏱️ <span id="timerDisplay">60</span>s</div>
                         <div class="ui-pill lives-pill">❤️ <span id="livesDisplay">❤️❤️❤️</span></div>
-                        <button id="pauseBtn" class="btn-icon">⏸️</button>
+                        <div class="ui-pill-row">
+                            <button id="pauseBtn" class="btn-icon">⏸️</button>
+                            <button id="muteBtn" class="btn-icon">🔊</button>
+                        </div>
                     </div>
                 </div>
-
                 <div id="comboPopup" class="combo-popup"></div>
                 <div id="blessingPopup" class="blessing-popup">✨ GANESHA'S BLESSING ✨</div>
+                <div id="fpsDisplay" class="fps-display"></div>
             </div>
-
             <div class="canvas-container">
                 <canvas id="gameCanvas" width="1600" height="900"></canvas>
             </div>
-
             <div id="mobileControls" class="mobile-controls">
                 <button id="leftBtn" class="m-btn">◀</button>
                 <div class="m-center">
@@ -125,13 +161,14 @@
             </div>
         </div>
 
-        <!-- PAUSE SCREEN -->
+        <!-- PAUSE -->
         <div id="pauseScreen" class="screen modal-screen">
             <div class="modal-card small">
                 <h2>⏸️ PAUSED</h2>
+                <p class="pause-stats"><span id="pauseScore">Score: 0</span> • <span id="pauseStage">Stage 1</span></p>
                 <div class="menu-buttons">
                     <button id="resumeBtn" class="btn btn-primary">▶ RESUME</button>
-                    <button id="restartBtnPause" class="btn btn-secondary">🔄 RESTART</button>
+                    <button id="restartBtnPause" class="btn btn-secondary">🔄 RESTART STAGE</button>
                     <button id="mainMenuBtnPause" class="btn btn-secondary">🏠 MAIN MENU</button>
                 </div>
             </div>
@@ -139,16 +176,21 @@
 
         <!-- STAGE COMPLETE -->
         <div id="stageCompleteScreen" class="screen modal-screen">
-            <div class="modal-card">
-                <h2 id="stageCompleteTitle">🛕 STAGE COMPLETE!</h2>
+            <div class="modal-card celebration">
+                <div class="celebration-emoji">🎉 🛕 ✨</div>
+                <h2 id="stageCompleteTitle">STAGE COMPLETE!</h2>
+                <p id="stageCompleteDesc">You reached the Pandal with offerings!</p>
                 <div class="results-grid">
-                    <div class="result-item"><span>Score</span><b id="stageScore">0</b></div>
+                    <div class="result-item"><span>Stage Score</span><b id="stageScore">0</b></div>
                     <div class="result-item"><span>Best Combo</span><b id="stageCombo">x0</b></div>
                     <div class="result-item"><span>Golden Modaks</span><b id="stageGolden">0</b></div>
                     <div class="result-item"><span>Time Bonus</span><b id="stageTimeBonus">+0</b></div>
+                    <div class="result-item highlight"><span>Objective</span><b id="stageObjectiveStatus">✅ Complete</b></div>
+                    <div class="result-item highlight"><span>Total Score</span><b id="stageTotalScore">0</b></div>
                 </div>
                 <div class="menu-buttons">
                     <button id="nextStageBtn" class="btn btn-primary">➡️ NEXT STAGE</button>
+                    <button id="stageMenuBtn" class="btn btn-secondary">🏠 MAIN MENU</button>
                 </div>
             </div>
         </div>
@@ -163,6 +205,7 @@
                     <div class="result-item"><span>Best Combo</span><b id="finalCombo">x0</b></div>
                     <div class="result-item"><span>Golden Modaks</span><b id="finalGolden">0</b></div>
                     <div class="result-item"><span>Stages Cleared</span><b id="finalStages">0 / 3</b></div>
+                    <div class="result-item"><span>Offerings</span><b id="finalOfferings">0</b></div>
                     <div class="result-item highlight"><span>Best Score</span><b id="bestScoreDisplay">0</b></div>
                 </div>
                 <div class="menu-buttons">
@@ -174,18 +217,25 @@
 
         <!-- FINAL RESULTS -->
         <div id="resultsScreen" class="screen modal-screen">
-            <div class="modal-card celebration">
-                <div class="celebration-emoji">🎉 🐭 ✨</div>
+            <div class="modal-card celebration final">
+                <div class="celebration-emoji">🎉 🐭 🏆 ✨</div>
                 <h2>🏆 FESTIVAL COMPLETE!</h2>
-                <p>You helped prepare the grand Ganesh Chaturthi celebration!</p>
+                <p>You helped prepare the grand Ganesh Chaturthi celebration! Ganpati Bappa Morya!</p>
                 <div class="results-grid">
                     <div class="result-item"><span>Final Score</span><b id="resultFinalScore">0</b></div>
                     <div class="result-item"><span>Best Combo</span><b id="resultBestCombo">x0</b></div>
                     <div class="result-item"><span>Golden Modaks</span><b id="resultGolden">0</b></div>
                     <div class="result-item"><span>Total Offerings</span><b id="resultOfferings">0</b></div>
                     <div class="result-item"><span>Perfect Stages</span><b id="resultPerfect">0</b></div>
+                    <div class="result-item"><span>Stages</span><b id="resultStages">3 / 3</b></div>
                     <div class="result-item highlight"><span>Speed Bonus</span><b id="resultSpeed">+0</b></div>
                     <div class="result-item highlight total"><span>TOTAL SCORE</span><b id="resultTotal">0</b></div>
+                </div>
+                <div class="share-row">
+                    <p class="share-text">Share your score!</p>
+                    <div class="share-buttons">
+                        <button id="copyScoreBtn" class="btn btn-secondary small">📋 COPY SCORE</button>
+                    </div>
                 </div>
                 <div class="menu-buttons">
                     <button id="playAgainFinalBtn" class="btn btn-primary">🔄 PLAY AGAIN</button>
